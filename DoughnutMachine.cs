@@ -4,7 +4,7 @@ using System.Text;
 using System.Windows.Threading;
 using System;
 
-namespace Haidu_Claudiu_Lab2
+namespace Haidu_Claudiu_Lab
 {
     class DoughnutMachine : Component
     {
