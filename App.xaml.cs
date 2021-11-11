@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Haidu_Claudiu_Lab2
+namespace Haidu_Claudiu_Lab
 {
     /// <summary>
     /// Interaction logic for App.xaml
