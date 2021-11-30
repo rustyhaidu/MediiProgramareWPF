@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,46 +22,55 @@ namespace Haidu_Claudiu_Lab
     public partial class MainWindow : Window
     {
         private DoughnutMachine myDoughnutMachine;
-        private int mRaisedGlazed;
-        private int mRaisedSugar;
-        private int mFilledLemon;
-        private int mFilledChocolate;
-        private int mFilledVanilla;
+        private int m_RaisedGlazed;
+        private int m_RaisedSugar;
+        private int m_FilledLemon;
+        private int m_FilledChocolate;
+        private int m_FilledVanilla;
+
+        KeyValuePair<DoughnutType, double>[] PriceList = {
+             new KeyValuePair<DoughnutType, double>(DoughnutType.Sugar, 2.5),
+             new KeyValuePair<DoughnutType, double>(DoughnutType.Glazed,3),
+             new KeyValuePair<DoughnutType, double>(DoughnutType.Chocolate,4.5),
+             new KeyValuePair<DoughnutType, double>(DoughnutType.Vanilla,4),
+             new KeyValuePair<DoughnutType, double>(DoughnutType.Lemon,3.5)
+         };
+
         DoughnutType selectedDoughnut;
-     
+
         public MainWindow()
         {
-            InitializeComponent();           
-            CommandBinding cmd1 = new CommandBinding();           
-            cmd1.Command = ApplicationCommands.Print;           
-            ApplicationCommands.Print.InputGestures.Add(
-            new KeyGesture(Key.I, ModifierKeys.Alt));           
-            cmd1.Executed += new ExecutedRoutedEventHandler(CtrlP_CommandHandler);           
-            this.CommandBindings.Add(cmd1);          
+            InitializeComponent();
+
+            //creare obiect binding pentru comanda
+            CommandBinding cmd1 = new CommandBinding();
+            //asociere comanda
+            cmd1.Command = ApplicationCommands.Print;
+            //input gesture: I + Alt
+            ApplicationCommands.Print.InputGestures.Add(new KeyGesture(Key.I, ModifierKeys.Alt));
+            //asociem un handler
+            cmd1.Executed += new ExecutedRoutedEventHandler(CtrlP_CommandHandler);
+            //adaugam la colectia CommandBindings
+            CommandBindings.Add(cmd1);
+
+            //Doughnuts>Stop
+            //comanda custom
             CommandBinding cmd2 = new CommandBinding();
             cmd2.Command = CustomCommands.StopCommand.Launch;
-            cmd2.Executed += new ExecutedRoutedEventHandler(CtrlS_CommandHandler);          
-            this.CommandBindings.Add(cmd2);
-        }
-
-        private void CtrlS_CommandHandler(object sender, ExecutedRoutedEventArgs e)
-        {
-            //handler pentru comanda Ctrl+S -> se va executa stopToolStripMenuItem_Click
-            MessageBox.Show("Ctrl+S was pressed! The doughnut machine will stop!");
-            this.stopToolStripMenuItem_Click(sender, e);
-        }    
-
-        private void CtrlP_CommandHandler(object sender, ExecutedRoutedEventArgs e)
-        {
-            MessageBox.Show("You have in stock:" + mRaisedGlazed + " Glazed," + mRaisedSugar +
-                "Sugar, " + mFilledLemon + " Lemon, " + mFilledChocolate + " Chocolate, " + mFilledVanilla + " Vanilla"
-           );
+            cmd2.Executed += new
+            ExecutedRoutedEventHandler(CtrlS_CommandHandler);//asociem handler
+            CommandBindings.Add(cmd2);
         }
 
         private void frmMain_Loaded(object sender, RoutedEventArgs e)
         {
             myDoughnutMachine = new DoughnutMachine();
-            myDoughnutMachine.DoughnutComplete += new DoughnutMachine.DoughnutCompleteDelegate(DoughnutCompleteHandler);
+            myDoughnutMachine.DoughnutComplete += new
+            DoughnutMachine.DoughnutCompleteDelegate(DoughnutCompleteHandler);
+
+            cmbType.ItemsSource = PriceList;
+            cmbType.DisplayMemberPath = "Key";
+            cmbType.SelectedValuePath = "Value";
         }
 
         private void glazedToolStripMenuItem_Click(object sender, RoutedEventArgs e)
@@ -76,52 +86,87 @@ namespace Haidu_Claudiu_Lab
             myDoughnutMachine.MakeDoughnuts(DoughnutType.Sugar);
         }
 
+        private void lemonToolStripMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            lemonFilledMenuItem.IsChecked = true;
+            chocolateFilledMenuItem.IsChecked = false;
+            vanillaFilledMenuItem.IsChecked = false;
+            myDoughnutMachine.MakeDoughnuts(DoughnutType.Lemon);
+        }
+
+        private void chocolateToolStripMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            lemonFilledMenuItem.IsChecked = false;
+            chocolateFilledMenuItem.IsChecked = true;
+            vanillaFilledMenuItem.IsChecked = false;
+            myDoughnutMachine.MakeDoughnuts(DoughnutType.Chocolate);
+        }
+
+        private void vanillaToolStripMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            lemonFilledMenuItem.IsChecked = false;
+            chocolateFilledMenuItem.IsChecked = false;
+            vanillaFilledMenuItem.IsChecked = true;
+            myDoughnutMachine.MakeDoughnuts(DoughnutType.Vanilla);
+        }
+
         private void DoughnutCompleteHandler()
         {
             switch (myDoughnutMachine.Flavor)
             {
                 case DoughnutType.Glazed:
-                    mRaisedGlazed++;
-                    txtGlazedRaised.Text = mRaisedGlazed.ToString();
-                    break;
-
+                    {
+                        m_RaisedGlazed++;
+                        txtGlazedRaised.Text = m_RaisedGlazed.ToString();
+                        break;
+                    }
                 case DoughnutType.Sugar:
-                    mRaisedSugar++;
-                    txtSugarRaised.Text = mRaisedSugar.ToString();
-                    break;
+                    {
+                        m_RaisedSugar++;
+                        txtSugarRaised.Text = m_RaisedSugar.ToString();
+                        break;
+                    }
+
                 case DoughnutType.Lemon:
-                    mFilledLemon++;
-                    txtLemonFilled.Text = mFilledLemon.ToString(); break;
+                    {
+                        m_FilledLemon++;
+                        txtLemonFilled.Text = m_FilledLemon.ToString();
+                        break;
+                    }
                 case DoughnutType.Chocolate:
-                    mFilledChocolate++;
-                    txtChocolateFilled.Text = mFilledChocolate.ToString(); break;
+                    {
+                        m_FilledChocolate++;
+                        txtChocolateFilled.Text = m_FilledChocolate.ToString();
+                        break;
+                    }
                 case DoughnutType.Vanilla:
-                    mFilledVanilla++;
-                    txtVanillaFilled.Text = mFilledVanilla.ToString(); break;
+                    {
+                        m_FilledVanilla++;
+                        txtVanillaFilled.Text = m_FilledVanilla.ToString();
+                        break;
+                    }
+                default:
+                    {
+                        throw new InvalidEnumArgumentException($"Invalid Flavor {myDoughnutMachine.Flavor}");
+                    }
             }
-            myDoughnutMachine.DoughnutComplete += new DoughnutMachine.DoughnutCompleteDelegate(DoughnutCompleteHandler);
         }
-
-
 
         private void stopToolStripMenuItem_Click(object sender, RoutedEventArgs e)
         {
             myDoughnutMachine.Enabled = false;
-            this.Title = " Virtual Doughtnuts Factory ";
-            e.Handled = true;
         }
 
         private void exitToolStripMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void txtQuantity_KeyPress(object sender, KeyEventArgs e)
         {
             if (!(e.Key >= Key.D0 && e.Key <= Key.D9))
             {
-                MessageBox.Show("Numai cifre se pot introduce!", "Input Error", MessageBoxButton.OK,
-               MessageBoxImage.Error);
+                MessageBox.Show("Numai cifre se pot introduce!", "Input Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -140,16 +185,8 @@ namespace Haidu_Claudiu_Lab
             string mesaj;
             MenuItem SelectedItem = (MenuItem)e.OriginalSource;
             mesaj = SelectedItem.Header.ToString() + " doughnuts are being cooked!";
-            this.Title = mesaj;
+            Title = mesaj;
         }
-
-        KeyValuePair<DoughnutType, double>[] PriceList = {
-        new KeyValuePair<DoughnutType, double>(DoughnutType.Sugar, 2.5),
-        new KeyValuePair<DoughnutType, double>(DoughnutType.Glazed,3),
-        new KeyValuePair<DoughnutType, double>(DoughnutType.Chocolate,4.5),
-        new KeyValuePair<DoughnutType, double>(DoughnutType.Vanilla,4),
-        new KeyValuePair<DoughnutType, double>(DoughnutType.Lemon,3.5)
-        };
 
         private void cmbType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -166,36 +203,59 @@ namespace Haidu_Claudiu_Lab
             switch (selectedDoughnut)
             {
                 case DoughnutType.Glazed:
-                    if (q > mRaisedGlazed)
-                        r = 0;
-                    break;
+                    {
+                        if (q > m_RaisedGlazed)
+                        {
+                            r = 0;
+                        }
+
+                        break;
+                    }
                 case DoughnutType.Sugar:
-                    if (q > mRaisedSugar)
-                        r = 0;
-                    break;
+                    {
+                        if (q > m_RaisedSugar)
+                        {
+                            r = 0;
+                        }
+
+                        break;
+                    }
                 case DoughnutType.Chocolate:
-                    if (q > mFilledChocolate)
-                        r = 0;
-                    break;
+                    {
+                        if (q > m_FilledChocolate)
+                        {
+                            r = 0;
+                        }
+
+                        break;
+                    }
                 case DoughnutType.Lemon:
-                    if (q > mFilledLemon)
-                        r = 0;
-                    break;
+                    {
+                        if (q > m_FilledLemon)
+                        {
+                            r = 0;
+                        }
+
+                        break;
+                    }
                 case DoughnutType.Vanilla:
-                    if (q > mFilledVanilla)
-                        r = 0;
-                    break;
+                    {
+                        if (q > m_FilledVanilla)
+                        {
+                            r = 0;
+                        }
+
+                        break;
+                    }
             }
             return r;
         }
 
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        private void btnAddToSale_Click(object sender, RoutedEventArgs e)
         {
             if (ValidateQuantity(selectedDoughnut) > 0)
             {
-                lstSale.Items.Add(txtQuantity.Text + " " + selectedDoughnut.ToString() +
-               ":" + txtPrice.Text + " " + double.Parse(txtQuantity.Text) *
-               double.Parse(txtPrice.Text));
+                lstSale.Items.Add($"{txtQuantity.Text}\t{selectedDoughnut} : {txtPrice.Text}\t{double.Parse(txtQuantity.Text) * double.Parse(txtPrice.Text)}");
             }
             else
             {
@@ -210,40 +270,59 @@ namespace Haidu_Claudiu_Lab
 
         private void btnCheckOut_Click(object sender, RoutedEventArgs e)
         {
-            txtTotal.Text = (double.Parse(txtTotal.Text) + double.Parse(txtQuantity.Text)
-* double.Parse(txtPrice.Text)).ToString();
+            txtTotal.Text = (double.Parse(txtQuantity.Text) * double.Parse(txtPrice.Text)).ToString();
             foreach (string s in lstSale.Items)
             {
-                switch (s.Substring(s.IndexOf(" ") + 1, s.IndexOf(":") - s.IndexOf(" ") -
-               1))
+                var doughnutType = Helper.GetDoughnutTypeFromSaleListItem(s);
+
+                switch (doughnutType)
                 {
-                    case "Glazed":
-                        mRaisedGlazed = mRaisedGlazed - Int32.Parse(s.Substring(0,
-                       s.IndexOf(" ")));
-                        txtGlazedRaised.Text = mRaisedGlazed.ToString();
-                        break;
-                    case "Sugar":
-                        mRaisedSugar = mRaisedSugar - Int32.Parse(s.Substring(0,
-                       s.IndexOf(" ")));
-                        txtSugarRaised.Text = mRaisedSugar.ToString();
-                        break;
-                    case "Chocolate":
-                        mFilledChocolate = mFilledChocolate - Int32.Parse(s.Substring(0,
-                       s.IndexOf(" ")));
-                        txtChocolateFilled.Text = mFilledChocolate.ToString();
-                        break;
-                    case "Lemon":
-                        mFilledLemon = mFilledLemon - Int32.Parse(s.Substring(0,
-                       s.IndexOf(" ")));
-                        txtLemonFilled.Text = mFilledLemon.ToString();
-                        break;
-                    case "Vanilla":
-                        mFilledVanilla = mFilledVanilla - Int32.Parse(s.Substring(0,
-                       s.IndexOf(" ")));
-                        txtVanillaFilled.Text = mFilledVanilla.ToString();
-                        break;
+                    case DoughnutType.Glazed:
+                        {
+                            m_RaisedGlazed -= int.Parse(s.Substring(0, s.IndexOf($"{doughnutType}")));
+                            txtGlazedRaised.Text = m_RaisedGlazed.ToString();
+                            break;
+                        }
+                    case DoughnutType.Sugar:
+                        {
+                            m_RaisedSugar -= int.Parse(s.Substring(0, s.IndexOf(" ")));
+                            txtSugarRaised.Text = m_RaisedSugar.ToString();
+                            break;
+                        }
+                    case DoughnutType.Chocolate:
+                        {
+                            m_FilledChocolate -= int.Parse(s.Substring(0, s.IndexOf(" ")));
+                            txtChocolateFilled.Text = m_FilledChocolate.ToString();
+                            break;
+                        }
+                    case DoughnutType.Lemon:
+                        {
+                            m_FilledLemon -= int.Parse(s.Substring(0, s.IndexOf(" ")));
+                            txtLemonFilled.Text = m_FilledLemon.ToString();
+                            break;
+                        }
+                    case DoughnutType.Vanilla:
+                        {
+                            m_FilledVanilla -= int.Parse(s.Substring(0, s.IndexOf(" ")));
+                            txtVanillaFilled.Text = m_FilledVanilla.ToString();
+                            break;
+                        }
                 }
             }
         }
+
+        private void CtrlP_CommandHandler(object sender, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("You have in stock:" + m_RaisedGlazed + " Glazed," + m_RaisedSugar + "Sugar, " + m_FilledLemon +
+                " Lemon, " + m_FilledChocolate + " Chocolate, " + m_FilledVanilla + " Vanilla"
+           );
+        }
+
+        private void CtrlS_CommandHandler(object sender, ExecutedRoutedEventArgs e)
+        {
+            //handler pentru comanda Ctrl+S -> se va executa stopToolStripMenuItem_Click
+            MessageBox.Show("Ctrl+S was pressed! The doughnut machine will stop!");
+            stopToolStripMenuItem_Click(sender, e);
+        }
     }
-}
+  }
